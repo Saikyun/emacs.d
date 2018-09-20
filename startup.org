@@ -1,0 +1,106 @@
+* startup.org
+This is my file for configurating emacs. There are many like it, but this one is mine.
+** Saker att fixa
+*** DONE Konfigurera paredit
+    :LOGBOOK:
+    CLOCK: [2018-09-20 tor 11:28]--[2018-09-20 tor 11:53] =>  0:25
+    :END:
+**** DONE Fixa hotkeys
+*** DONE Gruppera koden
+*** DONE Fixa auto indent mode
+* Koden
+** Add the paths to melpa.
+#+begin_src emacs-lisp
+(let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
+                    (not (gnutls-available-p))))
+       (proto (if no-ssl "http" "https")))
+  ;; Comment/uncomment these two lines to enable/disable MELPA and MELPA Stable as desired
+  (add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t)
+  ;;(add-to-list 'package-archives (cons "melpa-stable" (concat proto "://stable.melpa.org/packages/")) t)
+  (when (< emacs-major-version 24)
+    ;; For important compatibility libraries like cl-lib
+    (add-to-list 'package-archives '("gnu" . (concat proto "://elpa.gnu.org/packages/")))))
+#+end_src
+
+#+RESULTS:
+
+** Fixa randomgrejer
+#+BEGIN_SRC emacs-lisp
+  (server-start)
+  
+  (keyboard-translate ?\C-u ?\C-x)
+    (keyboard-translate ?\C-x ?\C-u)
+
+    (define-key key-translation-map [?\M-x] [?\M-u])
+    (define-key key-translation-map [?\M-u] [?\M-x])
+
+    (setenv "PATH" (concat (getenv "PATH") ";C:\\Program Files\\Git\\mingw64\\bin"))
+#+END_SRC
+
+#+RESULTS:
+: C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\oracle\Ora11g\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files\Git LFS;C:\IFOR\WIN\BIN;C:\IFOR\WIN\BIN\EN_US;C:\Program Files\TortoiseSVN\bin;C:\Users\u045862\AppData\Local\Microsoft\WindowsApps;;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\mingw64\bin
+
+** Configure `helm-mode`.
+#+begin_src emacs-lisp
+(require 'helm-config)
+(helm-mode 1)
+#+end_src
+
+#+RESULTS:
+: t
+
+** Add scripts added without `package.el`.
+#+begin_src emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/scripts")
+  (let ((default-directory  "~/.emacs.d/scripts/"))
+      (normal-top-level-add-subdirs-to-load-path))
+
+  (require 'better-defaults)
+  (require 'auto-indent-mode)
+
+  (auto-indent-global-mode)
+
+  (global-linum-mode)
+#+end_src
+
+#+RESULTS:
+: t
+
+** Konfiguration för paredit.
+#+BEGIN_SRC emacs-lisp
+  (eval-after-load 'paredit
+    '(progn
+       (define-key paredit-mode-map (kbd "C-<backspace>") 'paredit-backward-kill-word)))
+
+#+END_SRC
+
+#+RESULTS:
+: paredit-backward-kill-word
+
+** Lisp-modes (bl.a. starta paredit-mode)
+#+begin_src emacs-lisp
+  (add-hook 'lisp-mode-hook 'enable-paredit-mode)
+  (add-hook 'emacs-lisp-mode-hook 'paredit-mode)
+
+  (add-to-list 'auto-mode-alist '("\\.cljs\\'" . lisp-mode))
+  (add-to-list 'auto-mode-alist '("\\.clj\\'" . lisp-mode))
+#+end_src
+
+** Globala hotkeys
+*** Generella
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "M-m") 'delete-indentation)
+  (global-set-key (kbd "C-S-z") 'revert-buffer)
+
+  (global-set-key (kbd "C-.") 'avy-goto-word-1)
+#+END_SRC
+*** Helm
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "M-x") #'helm-M-x)
+  (global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
+  (global-set-key (kbd "C-x C-f") #'helm-find-files)
+#+END_SRC
+
+
+#+RESULTS:
+: C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\oracle\Ora11g\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files\Git LFS;C:\IFOR\WIN\BIN;C:\IFOR\WIN\BIN\EN_US;C:\Program Files\TortoiseSVN\bin;C:\Users\u045862\AppData\Local\Microsoft\WindowsApps;;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\mingw64\bin
